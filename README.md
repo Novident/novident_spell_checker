@@ -24,16 +24,16 @@ Dart port of [symspell-ex](https://github.com/m-elbably/symspell-ex) (MIT) with 
 
 ## In-depth documentation
 
-Deeper guides live in [`docs/`](docs/):
+Deeper guides live in [`doc/`](doc/):
 
 | Guide | Contents |
 |---|---|
-| [Training & persistence](docs/training-and-persistence.md) | How to train dictionaries, measured timings, and how to keep the trained state alive (avoiding full rebuilds) |
-| [Dictionary formats](docs/dictionary-formats.md) | Every accepted format: plain lists, frequency lists, CSV, Hunspell `.dic` and personal dictionaries |
-| [Available dictionaries](docs/available-dictionaries.md) | Where to get real dictionaries (LibreOffice, Norvig, Wolf Garbe, word lists) and their licenses |
-| [Correction algorithms](docs/correction-algorithms.md) | How the tokenizer, exact membership, symmetric delete and Damerau-Levenshtein work, with known limitations |
-| [Editor integration](docs/editor-integration.md) | Global state management, tokenizing paragraphs and marking misspelled `TextSpan`s in a WYSIWYG editor |
-| [Testing](docs/testing.md) | What each test suite covers and how to run it |
+| [Training & persistence](doc/training-and-persistence.md) | How to train dictionaries, measured timings, and how to keep the trained state alive (avoiding full rebuilds) |
+| [Dictionary formats](doc/dictionary-formats.md) | Every accepted format: plain lists, frequency lists, CSV, Hunspell `.dic` and personal dictionaries |
+| [Available dictionaries](doc/available-dictionaries.md) | Where to get real dictionaries (LibreOffice, Norvig, Wolf Garbe, word lists) and their licenses |
+| [Correction algorithms](doc/correction-algorithms.md) | How the tokenizer, exact membership, symmetric delete and Damerau-Levenshtein work, with known limitations |
+| [Editor integration](doc/editor-integration.md) | Global state management, tokenizing paragraphs and marking misspelled `TextSpan`s in a WYSIWYG editor |
+| [Testing](doc/testing.md) | What each test suite covers and how to run it |
 
 ## Getting started
 
