@@ -21,10 +21,11 @@ import 'dictionary.dart';
 ///    multi-word pairs (`a lot`, used for missing-space corrections),
 ///  * a UTF-8 BOM on the first line.
 ///
-/// Note: flags are parsed but **not expanded**. Affix-heavy dictionaries
-/// (e.g. `de_DE`) store only stems; to check inflected forms, use a
-/// full-form dictionary variant (e.g. LibreOffice's `es_ANY.dic` for
-/// Spanish) or implement `.aff` expansion as a separate build step.
+/// Optional `.aff` support. Flags are parsed and preserved, and when the
+/// companion `.aff` file is present, `HunspellDictionary.expand(AffixRules)`
+/// generates the full word forms (`trabajar` → `trabajamos`,
+/// `work` → `worked`, `rework`, `reworked`). Without it, only stems are
+/// trained.
 class HunspellDictionary {
   /// Regular terms (flags stripped), frequency 1 each.
   final Dictionary terms;
