@@ -496,7 +496,6 @@ class SymSpellEx {
     for (final token in tokens) {
       var term = token.value;
       var termSuggestion = Suggestion(term, null, 0, 0);
-      final postDistance = token.distance;
 
       if (token.tag == TokenTags.word && token.value.length >= 2) {
         final lSuggestions = lookup(
@@ -522,9 +521,7 @@ class SymSpellEx {
       suggestions.add(termSuggestion);
       term = termSuggestion.suggestion ?? termSuggestion.term;
       outputBuffer.write(term);
-      if (postDistance > 0 && !term.endsWith(' ')) {
-        outputBuffer.write(' ' * postDistance);
-      }
+      outputBuffer.write(token.spacing);
     }
 
     return Correction(input, outputBuffer.toString(), suggestions);
