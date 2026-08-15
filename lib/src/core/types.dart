@@ -7,7 +7,20 @@ class Token {
   String? alphabet;
   int distance;
 
-  Token(this.value, [this.tag, this.alphabet, this.distance = 0]);
+  /// Start offset of this token in the original input string.
+  int offset;
+
+  /// Exact whitespace (spaces, tabs, newlines, …) that followed this token
+  /// in the original input — empty when nothing followed it. Rebuilding
+  /// `value + spacing` over all tokens reproduces the input exactly.
+  String spacing;
+
+  Token(this.value,
+      [this.tag,
+      this.alphabet,
+      this.distance = 0,
+      this.offset = 0,
+      this.spacing = '']);
 }
 
 /// A single correction suggestion for a term.

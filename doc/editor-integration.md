@@ -78,20 +78,26 @@ Startup strategy (measured on a real 56k-word dictionary):
 
 ## 2. Tokenizing a full paragraph
 
-`CoreTokenizer.tokenize` returns typed tokens with a `distance` field that
-records the original spacing (1 = a space followed this token). Keep it —
-it lets you rebuild the exact text when building spans.
+`CoreTokenizer.tokenize` returns typed tokens with two fields that make the
+round-trip to the original text **exact**:
+
+- `offset` — the token's start position in the original input, so
+  misspelled-word ranges map back to the document without drift.
+- `spacing` — the exact whitespace that followed the token (spaces, tabs,
+  newlines — empty if none). `token.value + token.spacing` over all tokens
+  reproduces the input byte-for-byte.
 
 ```dart
 final tokens = CoreTokenizer().tokenize('In 1905, Einstein wrote.');
 
 for (final token in tokens) {
-  print('${token.value} | tag=${token.tag} | distance=${token.distance}');
+  print('${token.value} | tag=${token.tag} | offset=${token.offset} | '
+      'spacing="${token.spacing}"');
 }
-// In   | tag=word | distance=1
-// 1905 | tag=number | distance=0
-// ,    | tag=none | distance=1
-// Einstein | tag=word | distance=1
+// In       | tag=word | offset=0  | spacing=" "
+// 1905     | tag=number | offset=3 | spacing=""
+// ,        | tag=none | offset=7 | spacing=" "
+// Einstein | tag=word | offset=9  | spacing=" "
 // ...
 ```
 
@@ -100,9 +106,8 @@ Rules to remember when consuming tokens:
 - Only `tag == TokenTags.word` tokens are spell-checkable.
 - Skip words shorter than 2 characters (matches the engine's behavior).
 - Untagged tokens (like `,`) are literal text — never looked up.
-- `token.value` of an untagged token may already end with the space
-  (e.g. `', '`); reconstruct spacing with
-  `token.distance > 0 && !token.value.endsWith(' ')`.
+- Rebuild spacing with `token.spacing` — never from `token.distance`
+  (that legacy 0/1 flag only detects a single ASCII space).
 
 ## 3. Marking misspelled words with `TextSpan`s
 
@@ -120,7 +125,6 @@ List<TextSpan> buildSpellCheckedSpans({
   final spans = <TextSpan>[];
 
   for (final token in CoreTokenizer().tokenize(text)) {
-    var value = token.value;
     var style = normal;
 
     if (token.tag == TokenTags.word && token.value.length >= 2) {
@@ -129,12 +133,8 @@ List<TextSpan> buildSpellCheckedSpans({
       }
     }
 
-    // Re-attach the original trailing space (see tokenizer distance).
-    if (token.distance > 0 && !value.endsWith(' ')) {
-      value = '$value ';
-    }
-
-    spans.add(TextSpan(text: value, style: style));
+    // Re-attach the exact original spacing.
+    spans.add(TextSpan(text: token.value + token.spacing, style: style));
   }
 
   return spans;
@@ -200,5 +200,5 @@ void showSuggestions(BuildContext context, String word, String language) {
 - [ ] Per-language asset dictionary loaded once (`AssetDictionaryLoader`).
 - [ ] Forbidden set per user/language checked before vocabulary.
 - [ ] Spans rebuilt with debounce; spacing reconstructed via
-      `token.distance`.
+      `token.spacing` (exact), offsets taken from `token.offset`.
 - [ ] Context menu reads from the lazy `suggestions(language)`.

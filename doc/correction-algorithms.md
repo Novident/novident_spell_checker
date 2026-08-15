@@ -16,15 +16,18 @@ segments recurse until classified.
 
 ```dart
 final tokens = CoreTokenizer().tokenize('In 1905, Einstein wrote.');
-// [Token('In', tag: word, distance: 1), Token('1905', tag: number), ...]
+// [Token('In', tag: word, offset: 0, spacing: ' '), Token('1905', tag: number), ...]
 ```
 
 Key properties:
 
 - `tag` — `url`, `number`, `word`, `punctuation`, `space`, `none`.
-- `distance` — number of spaces that followed the token in the original
-  text (1 or 0). Used to reconstruct the exact original spacing when
-  rebuilding the text (corrections or `TextSpan`s).
+- `offset` — the token's start position in the original input; exact
+  misspelled-range mapping for editors.
+- `spacing` — the exact whitespace that followed the token (multi-spaces,
+  tabs, newlines included). Rebuilding `value + spacing` reproduces the
+  input losslessly; the legacy `distance` field is only a 0/1
+  single-space flag.
 - Non-word tokens (`numbers`, urls, punctuation) are never looked up.
 
 Known quirk (faithful to the original): `,` is not in the punctuation
