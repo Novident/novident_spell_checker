@@ -1,7 +1,10 @@
 name: novident_spell_checker
 description: "Spelling correction & fuzzy search based on the symmetric delete spelling correction algorithm. Dart port of symspell-ex with some extra things."
 version: 1.0.0
-homepage:
+homepage: https://github.com/Novident/
+repository: https://github.com/Novident/novident_spell_checker/
+documentation: https://github.com/Novident/novident_spell_checker/
+issue_tracker: https://github.com/Novident/novident_spell_checker/issues
 
 environment:
   sdk: ">=3.4.3 <4.0.0"
