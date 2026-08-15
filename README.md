@@ -1,4 +1,4 @@
-# novident_spell_checker
+# Novident Spell Checker 
 
 Spelling correction & fuzzy search for the **Novident** suite, based on the **symmetric
 delete spelling correction algorithm**.
