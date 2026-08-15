@@ -17,6 +17,8 @@ Dart port of [symspell-ex](https://github.com/m-elbably/symspell-ex) (MIT) with 
   per-keystroke hot path.
 - `correction` for full sentences, `lookup`/`search` for fuzzy suggestions,
   `train` for bulk dictionaries.
+- Optional Hunspell `.aff` support — expand stems to full word forms when
+  the affix file is present (`es_ES`: 56k stems → 652k forms, 11.7x).
 
 > **API note:** the original symspell-ex API is `async` only because of its
 > Redis store. This port keeps a `DataStore` abstraction, but the default
@@ -191,9 +193,11 @@ Or via assets: `AssetDictionaryLoader.loadHunspell('assets/dictionaries/es.dic')
 
 Notes:
 
-- Flags are parsed but **not expanded**. For morphologically rich languages
-  prefer full-form dictionaries (e.g. `es_ANY.dic` for Spanish) or implement
-  `.aff` expansion as a build step.
+- **Optional `.aff` support.** Flags are parsed and preserved, and when the
+  companion `.aff` file is present, `HunspellDictionary.expand(AffixRules)`
+  generates the full word forms (`trabajar` → `trabajamos`,
+  `work` → `worked`, `rework`, `reworked`). Without it, only stems are
+  trained. See [doc/dictionary-formats.md](doc/dictionary-formats.md).
 - LibreOffice dictionary files ship in
   [cgit.freedesktop.org/libreoffice/dictionaries](https://cgit.freedesktop.org/libreoffice/dictionaries/);
   check each dictionary's license (many are GPL/LGPL/MPL).

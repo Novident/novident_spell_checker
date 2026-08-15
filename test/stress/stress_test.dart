@@ -441,9 +441,8 @@ void main() {
 
         // Recall throughput on substitution typos of real dictionary words.
         final generator = _Generator(Random(21));
-        final words = dict.terms.terms.keys
-            .where((w) => w.length >= 6)
-            .toList();
+        final words =
+            dict.terms.terms.keys.where((w) => w.length >= 6).toList();
         final typos = List<(String, String)>.generate(5000, (_) {
           final word = words[generator.rng.nextInt(words.length)];
           return (word, generator.misspell(word));
@@ -500,6 +499,28 @@ void main() {
         expect(stopwatch.elapsed, lessThan(const Duration(seconds: 30)));
       },
     );
+
+    test('expands es_ES stems with its .aff rules', skip: skip, () {
+      final dict = HunspellDictionary.fromLines(
+        File(hunspellAsset).readAsLinesSync(),
+      );
+      final affix = AffixRules.fromString(
+        File('test/assets/dictionaries/es_ES.aff').readAsStringSync(),
+      );
+
+      final stopwatch = Stopwatch()..start();
+      final expanded = dict.expand(affix);
+      stopwatch.stop();
+
+      debugPrint(
+        '[STRESS] expand es_ES with .aff: ${stopwatch.elapsedMilliseconds} ms '
+        '(${dict.length} stems -> ${expanded.length} forms, '
+        '${(expanded.length / dict.length).toStringAsFixed(1)}x)',
+      );
+
+      expect(expanded.length, greaterThan(dict.length * 5));
+      expect(stopwatch.elapsed, lessThan(const Duration(seconds: 30)));
+    });
   });
 
   group('Stress: streaming I/O', () {

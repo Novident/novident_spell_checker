@@ -38,8 +38,8 @@ class SymSpellEx {
     Tokenizer? tokenizer,
     this.maxDistance = defaultMaxDistance,
     this.maxSuggestions = defaultMaxSuggestions,
-  }) : editDistance = editDistance ?? DamerauLevenshteinDistance(),
-       _tokenizer = tokenizer ?? CoreTokenizer();
+  })  : editDistance = editDistance ?? DamerauLevenshteinDistance(),
+        _tokenizer = tokenizer ?? CoreTokenizer();
 
   void initialize() {
     store.initialize();
@@ -142,8 +142,7 @@ class SymSpellEx {
       candidate = candidates.removeFirst();
 
       inputCandidateDistance = iLength - candidate.length;
-      candidateHasHigherDistance =
-          suggestions.isNotEmpty &&
+      candidateHasHigherDistance = suggestions.isNotEmpty &&
           inputCandidateDistance > suggestions[0].distance;
       if (candidateHasHigherDistance) {
         break;

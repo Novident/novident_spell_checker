@@ -32,7 +32,7 @@ class Correction {
   List<Suggestion> suggestions;
 
   Correction(this.input, this.output, [List<Suggestion>? suggestions])
-    : suggestions = suggestions ?? <Suggestion>[];
+      : suggestions = suggestions ?? <Suggestion>[];
 }
 
 /// Dictionary entry stored in a [DataStore].
@@ -46,7 +46,7 @@ class DictionaryEntry extends ListBase<int> {
   final List<int?> _values;
 
   DictionaryEntry([int frequency = 0, List<int> suggestions = const []])
-    : _values = <int?>[frequency, ...suggestions];
+      : _values = <int?>[frequency, ...suggestions];
 
   @override
   int get length => _values.length;

@@ -89,8 +89,7 @@ class DamerauLevenshteinDistance implements EditDistance {
           newScore = _score[i * rowSize + j];
           db = j;
         } else {
-          newScore =
-              math.min(
+          newScore = math.min(
                 _score[i * rowSize + j],
                 math.min(
                   _score[(i + 1) * rowSize + j],

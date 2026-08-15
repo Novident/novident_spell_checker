@@ -55,10 +55,8 @@ class CoreTokenizer implements Tokenizer {
   List<Token> _tokenizeSegment(String input) {
     var tokens = <Token>[];
     for (final expression in _expressions) {
-      final matches = expression.value
-          .allMatches(input)
-          .map((m) => m.group(0)!)
-          .toList();
+      final matches =
+          expression.value.allMatches(input).map((m) => m.group(0)!).toList();
       final parts = input.split(expression.value);
 
       var mIndex = 0;
@@ -105,9 +103,8 @@ class CoreTokenizer implements Tokenizer {
     for (var i = 0; i < bTokens.length; i++) {
       final pSpaceIndex = input.value.indexOf('${bTokens[i].value.trim()} ');
       final tDistance = pSpaceIndex >= 0 ? 1 : 0;
-      bTokens[i].distance = i >= bTokens.length - 1
-          ? input.distance
-          : tDistance;
+      bTokens[i].distance =
+          i >= bTokens.length - 1 ? input.distance : tDistance;
 
       if (bTokens[i].tag == null) {
         _tokenizeInput(bTokens[i], tokens);

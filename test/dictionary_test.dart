@@ -221,11 +221,14 @@ void main() {
           final dict = await Dictionary.fromByteStream(
             _chunked(bytes, chunkSize),
           );
-          expect(dict.terms, {
-            'adiós': 3,
-            'música': 4,
-            'hola': 1,
-          }, reason: 'chunk size $chunkSize');
+          expect(
+              dict.terms,
+              {
+                'adiós': 3,
+                'música': 4,
+                'hola': 1,
+              },
+              reason: 'chunk size $chunkSize');
         }
       },
     );

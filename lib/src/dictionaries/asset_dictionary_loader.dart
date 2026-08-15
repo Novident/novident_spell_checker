@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 
+import 'affix_rules.dart';
 import 'dictionary.dart';
 import 'hunspell_dictionary.dart';
 
@@ -34,5 +35,27 @@ class AssetDictionaryLoader {
   }) async {
     final data = await (bundle ?? rootBundle).loadString(assetPath);
     return HunspellDictionary.fromString(data);
+  }
+
+  /// Loads and parses a Hunspell `.aff` affix-rules asset.
+  static Future<AffixRules> loadAffix(
+    String assetPath, {
+    AssetBundle? bundle,
+  }) async {
+    final data = await (bundle ?? rootBundle).loadString(assetPath);
+    return AffixRules.fromString(data);
+  }
+
+  /// Loads a Hunspell `.dic` asset and, when present, its `.aff` companion,
+  /// returning the fully expanded [Dictionary] (stems + all generated
+  /// forms) ready for [SymSpellEx.trainDictionary].
+  static Future<Dictionary> loadHunspellWithAffixes(
+    String dicPath,
+    String affPath, {
+    AssetBundle? bundle,
+  }) async {
+    final dictionary = await loadHunspell(dicPath, bundle: bundle);
+    final affix = await loadAffix(affPath, bundle: bundle);
+    return dictionary.expand(affix);
   }
 }

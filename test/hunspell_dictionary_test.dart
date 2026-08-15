@@ -167,11 +167,14 @@ void main() {
         final dict = await HunspellDictionary.fromByteStream(
           _hChunked(bytes, chunkSize),
         );
-        expect(dict.terms.terms, {
-          'hola': 1,
-          'try': 1,
-          'work': 1,
-        }, reason: 'chunk size $chunkSize');
+        expect(
+            dict.terms.terms,
+            {
+              'hola': 1,
+              'try': 1,
+              'work': 1,
+            },
+            reason: 'chunk size $chunkSize');
         expect(dict.flags, {'try': 'B', 'work': 'AB'});
         expect(dict.pairs, ['a lot']);
         expect(dict.forbidden, {'villanox'});

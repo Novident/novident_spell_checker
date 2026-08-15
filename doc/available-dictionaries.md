@@ -22,10 +22,11 @@ speller.trainDictionary(dict.terms, Languages.spanish);
 
 Notes:
 
-- **Affix-heavy languages** (German, Hungarian, …): `.dic` stores stems;
-  inflected forms come from the `.aff` rules. Prefer a full-form variant
-  when it exists (e.g. `es_ANY.dic` historically, `en_US` is mostly
-  full-form) or implement `.aff` expansion.
+- **Affix-heavy languages** (German, Hungarian, …): `.dic` stores stems and
+  the `.aff` generates the inflected forms — ship both files and use
+  `HunspellDictionary.expand(AffixRules)` / `loadHunspellWithAffixes` to
+  get the full vocabulary (see
+  [dictionary-formats.md](dictionary-formats.md)).
 - **Licenses**: each dictionary folder carries its own license
   (`GPLv3.txt`, `LGPLv3.txt`, `MPL-1.1.txt`, …). Check them for
   proprietary apps — many are GPL/LGPL/MPL.

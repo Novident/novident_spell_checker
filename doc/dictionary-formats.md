@@ -83,11 +83,44 @@ Parsing rules:
 - `*word` → added to `dict.forbidden` (lowercased); never trained.
 - Entries containing spaces → `dict.pairs` (missing-space corrections).
 
-> Flags are parsed but **not expanded**. `.dic` files of morphologically
-> rich languages store stems only; inflected forms are generated from the
-> `.aff` rules at check time (that is what Hunspell does). For a full-form
-> word list, use a dictionary variant that ships all forms (e.g. LibreOffice
-> `es_ANY.dic`) or implement `.aff` expansion as a build step.
+### Optional `.aff` expansion (full word forms)
+
+Affix-heavy dictionaries store only **stems** with flags; the inflected
+forms are generated from the companion `.aff` file. This library supports
+that optionally — the `.dic` works alone (stems only), and with the `.aff`
+present you get the full vocabulary:
+
+```dart
+final dictionary = await AssetDictionaryLoader.loadHunspell(
+  'assets/dictionaries/es_ES.dic',
+);
+final affix = await AssetDictionaryLoader.loadAffix(
+  'assets/dictionaries/es_ES.aff',
+);
+
+final fullForms = dictionary.expand(affix);   // stems + all generated forms
+speller.trainDictionary(fullForms, Languages.spanish);
+
+// Or both at once:
+final dict = await AssetDictionaryLoader.loadHunspellWithAffixes(
+  'assets/dictionaries/es_ES.dic',
+  'assets/dictionaries/es_ES.aff',
+);
+```
+
+Measured on the real LibreOffice Spanish dictionary: 55,820 stems →
+**652,256 forms (11.7x)** in ~1.1 s.
+
+`AffixRules` supports the directives that matter for form generation:
+`FLAG` (default / `long` / `num` / `UTF-8`), `PFX` and `SFX` — including
+stripping, conditions (`.`, `[abc]`, `[^abc]`, multi-char), cross products
+(`Y`/`N`) and `/` continuation classes (e.g. `able/Y` → twofold
+suffixation). `SET`, `TRY`, `REP`, `KEY`, `ICONV` and compounding
+directives are ignored (they affect ranking/compounds, not the set of
+valid forms).
+
+Frequencies of generated forms are 1 (the Hunspell format has no frequency
+field), so suggestion ranking within an expanded dictionary is uniform.
 
 ## 5. Hunspell personal dictionary
 

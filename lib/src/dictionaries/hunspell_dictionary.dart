@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'affix_rules.dart';
 import 'dictionary.dart';
 
 /// A parsed Hunspell dictionary (`.dic`) and/or personal dictionary.
@@ -45,13 +46,37 @@ class HunspellDictionary {
     Set<String>? forbidden,
     List<String>? pairs,
     Map<String, String>? flags,
-  }) : terms = terms ?? Dictionary(const {}),
-       forbidden = forbidden ?? const <String>{},
-       pairs = pairs ?? const <String>[],
-       flags = flags ?? const <String, String>{};
+  })  : terms = terms ?? Dictionary(const {}),
+        forbidden = forbidden ?? const <String>{},
+        pairs = pairs ?? const <String>[],
+        flags = flags ?? const <String, String>{};
 
   /// Number of regular terms.
   int get length => terms.length;
+
+  /// Expands stems and their flags into all generated word forms using
+  /// [affix] rules (the `.aff` companion file).
+  ///
+  /// Without affix rules this dictionary holds stems only; with them, each
+  /// stem generates its inflected/derived forms (`trabajar` → `trabajamos`,
+  /// `work` → `worked`, `rework`, `reworked`, …). The result is a plain
+  /// [Dictionary] ready for [SymSpellEx.trainDictionary].
+  ///
+  /// Frequencies are all 1 (the Hunspell format has no frequency field).
+  Dictionary expand(AffixRules affix) {
+    final expanded = <String, int>{};
+    for (final stem in terms.terms.keys) {
+      expanded[stem] = 1;
+      final flagPart = flags[stem];
+      if (flagPart == null || flagPart.isEmpty) {
+        continue;
+      }
+      for (final form in affix.expand(stem, flagPart)) {
+        expanded.putIfAbsent(form, () => 1);
+      }
+    }
+    return Dictionary(expanded);
+  }
 
   /// Parses [lines] into a [HunspellDictionary].
   factory HunspellDictionary.fromLines(List<String> lines) {
@@ -169,7 +194,7 @@ class HunspellDictionary {
   static int _unescapedSlashIndex(String line) {
     for (var i = 0; i < line.length; i++) {
       if (line.codeUnitAt(i) == 0x2F /* / */ &&
-          (i == 0 || line.codeUnitAt(i - 1) != 0x5C /* \ */ )) {
+          (i == 0 || line.codeUnitAt(i - 1) != 0x5C /* \ */)) {
         return i;
       }
     }
@@ -212,9 +237,8 @@ class _HunspellParser {
     // Split the word from its flags at the first unescaped slash.
     final slashIndex = HunspellDictionary._unescapedSlashIndex(line);
     final wordPart = slashIndex == -1 ? line : line.substring(0, slashIndex);
-    final flagPart = slashIndex == -1
-        ? ''
-        : line.substring(slashIndex + 1).trim();
+    final flagPart =
+        slashIndex == -1 ? '' : line.substring(slashIndex + 1).trim();
     final word = wordPart.replaceAll(r'\/', '/').trim();
 
     if (word.isEmpty) {

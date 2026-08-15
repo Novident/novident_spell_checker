@@ -20,7 +20,7 @@ Ported from the original symspell-ex suite plus additions:
 - `clear()` and Damerau-Levenshtein reference distances.
 
 ## 2. `test/dictionary_test.dart`, `test/hunspell_dictionary_test.dart`,
-   `test/trie_test.dart` — dictionary layer
+   `test/trie_test.dart`, `test/affix_test.dart` — dictionary layer
 
 - `Dictionary`: comma format, whitespace format, plain word lists,
   comments/malformed records, `fromCsv`, `toLines` round-trip.
@@ -32,6 +32,12 @@ Ported from the original symspell-ex suite plus additions:
   limit), case normalization, unicode.
 - `SymSpellEx.hasTerm`: terms vs delete keys, language awareness,
   dictionary-trained words.
+- `AffixRules` (`.aff`): the Hunspell manual example (cross products,
+  `-y/ied`), cross product control (`Y`/`N`), continuation classes
+  (twofold suffixation), multi-char conditions (`[^ch]ibir`),
+  `FLAG long/num/UTF-8`, and real expansions of `en_US` and `es_ES`
+  (56k stems → 652k forms, 11.7x), plus chunked `.aff` parsing and
+  `loadHunspellWithAffixes`.
 
 ## 3. `test/real_world_test.dart` — standard real-world data sets
 
@@ -43,6 +49,8 @@ Assets in `test/assets/`:
 | `dictionaries/en_count_big.txt` | Norvig — 29,136 real English words with counts |
 | `dictionaries/sgb_words.txt` | Knuth's Stanford GraphBase — 5,757 five-letter words, plain list |
 | `dictionaries/es_ES.dic` | LibreOffice — real Spanish Hunspell dictionary (58,221 lines) |
+| `dictionaries/es_ES.aff` | LibreOffice — the affix rules that expand the stems (6,872 lines) |
+| `dictionaries/en_US.dic`, `en_US.aff` | LibreOffice — real American English Hunspell pair |
 | `dictionaries/es_common.txt`, `es_personal.txt` | Curated Spanish list + personal dictionary |
 
 Guarantees enforced:
@@ -74,7 +82,7 @@ catastrophic regressions:
   `Trie` (build, probe throughput, memory proxy).
 - **Hunspell pipeline** on the real `es_ES.dic`: parse, train
   (2M entries, 37x amplification), 5k typo lookups with recall, asset
-  loader timing.
+  loader timing, and `.aff` expansion (56k stems → 652k forms in ~1.1 s).
 - Memory hygiene after `clear()`.
 
 ```sh
@@ -91,7 +99,10 @@ flutter test             # layers 1-3 (stress tests appear as skipped)
 
 ## What is NOT covered (honest gaps)
 
-- `.aff` affix expansion (flags are parsed, not applied).
+- `.aff` directives beyond form generation: compounding, `ICONV`,
+  `NEEDAFFIX`, and casing rules are parsed-neutral (ignored); expansion
+  covers `FLAG` types, `PFX`/`SFX` stripping, conditions, cross products
+  and continuation classes.
 - Context-aware corrections (a valid word is never replaced).
 - Diacritic-insensitive matching (`tu` vs `tú`).
 - Store serialization across app restarts.
